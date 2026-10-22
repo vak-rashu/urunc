@@ -16,9 +16,11 @@ package hypervisors
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"strconv"
 
+	"github.com/sirupsen/logrus"
 	"github.com/urunc-dev/urunc/pkg/unikontainers/types"
 	"golang.org/x/sys/unix"
 )
@@ -71,13 +73,24 @@ func (q *Qemu) BuildExecCmd(args types.ExecArgs, ukernel types.Unikernel) ([]str
 		q.binaryPath,
 		"-m", qemuMem + "M",
 		"-L", "/usr/share/qemu", // Set the path for qemu bios/data
-		"-cpu", "host", // Choose CPU
-		"-enable-kvm",      // Enable KVM to use CPU virt extensions
+		// "-cpu", "host", // Choose CPU
+		// "-enable-kvm",      // Enable KVM to use CPU virt extensions
+		// "-cpu", "max", // Change "host" to "max" if KVM is disabled
+		// "-accel", "tcg",
 		"-display", "none", // Disable graphic output
 		"-vga", "none",
 		"-serial", "stdio",
 		"-monitor", "null",
 	}
+
+	_, err := os.Open("/dev/kvm")
+	if err == nil {
+		exArgs = append(exArgs, "-cpu", "host", "-enable-kvm")
+	} else {
+		logrus.Warn("KVM unavailable, falling back to TCG (software emulation): expect much slower performance")
+		exArgs = append(exArgs, "-cpu", "max", "-accel", "tcg")
+	}
+
 	// Expose the QMP socket only when socket_path is set. server=on,wait=off lets
 	// QEMU boot without waiting for a client.
 	if args.SocketPath != "" {
