@@ -20,7 +20,6 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/sirupsen/logrus"
 	"github.com/urunc-dev/urunc/pkg/unikontainers/types"
 	"golang.org/x/sys/unix"
 )
@@ -34,6 +33,7 @@ type Qemu struct {
 	binaryPath string
 	binary     string
 	vhost      bool
+	// kvm        bool
 }
 
 func (q *Qemu) Signal(pid int, signal unix.Signal) error {
@@ -84,11 +84,10 @@ func (q *Qemu) BuildExecCmd(args types.ExecArgs, ukernel types.Unikernel) ([]str
 	}
 
 	_, err := os.Open("/dev/kvm")
-	if err == nil {
-		exArgs = append(exArgs, "-cpu", "host", "-enable-kvm")
-	} else {
-		logrus.Warn("KVM unavailable, falling back to TCG (software emulation): expect much slower performance")
+	if err != nil {
 		exArgs = append(exArgs, "-cpu", "max", "-accel", "tcg")
+	} else {
+		exArgs = append(exArgs, "-cpu", "host", "-enable-kvm")
 	}
 
 	// Expose the QMP socket only when socket_path is set. server=on,wait=off lets

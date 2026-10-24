@@ -190,7 +190,7 @@ At last, update the containerd configuration for devmapper:
 
 - In containerd v2.x find and change or append the following lines:
 
-```toml
+```bash
 [plugins.'io.containerd.snapshotter.v1.devmapper']
   pool_name = "containerd-pool"
   root_path = "/var/lib/containerd/io.containerd.snapshotter.v1.devmapper"
@@ -201,7 +201,7 @@ At last, update the containerd configuration for devmapper:
 
 Also, the transfer service needs to get updated accordingly:
 
-```toml
+```bash
 # Setting unpack_config replaces the default entry, so overlayfs must be listed too.
 [[plugins.'io.containerd.transfer.v1.local'.unpack_config]]
   platform = "linux/amd64"
@@ -253,7 +253,7 @@ for the blockfile snapshotter:
 
 - In containerd v2.x find and change or append the following lines:
 
-```toml
+```bash
 [plugins.'io.containerd.snapshotter.v1.blockfile']
   fs_type = "ext4"
   mount_options = []
@@ -265,7 +265,7 @@ for the blockfile snapshotter:
 
 Also, the transfer service needs to get updated accordingly:
 
-```toml
+```bash
 # Setting unpack_config replaces the default entry, so overlayfs must be listed too.
 [[plugins.'io.containerd.transfer.v1.local'.unpack_config]]
   platform = "linux/amd64"
@@ -278,7 +278,7 @@ Also, the transfer service needs to get updated accordingly:
 
 - In containerd v1.x find and change or append the following lines:
 
-```toml
+```bash
 [plugins."io.containerd.snapshotter.v1.blockfile"]
   fs_type = "ext4"
   mount_options = []

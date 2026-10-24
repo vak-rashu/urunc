@@ -51,6 +51,11 @@ var vmmFactories = map[VmmType]VMMFactory{
 	QemuVmm: {
 		binary: QemuBinary,
 		createFunc: func(binary, binaryPath string, vhost bool) types.VMM {
+			// kvm := true
+			// if _, err := os.Open("/dev/kvm"); err != nil {
+			// 	kvm = false
+			// 	vmmLog.Info("KVM unavailable, falling back to TCG (software emulation)")
+			// }
 			return &Qemu{binary: binary, binaryPath: binaryPath, vhost: vhost}
 		},
 	},
